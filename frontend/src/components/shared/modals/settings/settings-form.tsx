@@ -16,6 +16,8 @@ import { APIKeyInput } from "../../inputs/api-key-input";
 import { BaseUrlInput } from "../../inputs/base-url-input";
 import { ConfirmationModeSwitch } from "../../inputs/confirmation-mode-switch";
 import { CustomModelInput } from "../../inputs/custom-model-input";
+import { CustomVisionModelInput } from "../../inputs/vision-model-input";
+import { CustomStructuredOutputModelInput } from "../../inputs/structured-output-model-input";
 import { SecurityAnalyzerInput } from "../../inputs/security-analyzers-input";
 import { ModalBackdrop } from "../modal-backdrop";
 import { ModelSelector } from "./model-selector";
@@ -156,6 +158,14 @@ export function SettingsForm({
               <CustomModelInput
                 isDisabled={!!disabled}
                 defaultValue={settings.LLM_MODEL}
+              />
+              <CustomVisionModelInput
+                isDisabled={!!disabled}
+                defaultValue={settings.VLM_MODEL}
+              />
+              <CustomStructuredOutputModelInput
+                isDisabled={!!disabled}
+                defaultValue={settings.STRUCTURED_OUTPUT_MODEL}
               />
 
               <BaseUrlInput

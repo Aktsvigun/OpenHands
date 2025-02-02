@@ -1,5 +1,7 @@
 export type Settings = {
   LLM_MODEL: string;
+  VLM_MODEL: string;
+  STRUCTURED_OUTPUT_MODEL: string;
   LLM_BASE_URL: string;
   AGENT: string;
   LANGUAGE: string;
@@ -14,6 +16,8 @@ export type Settings = {
 
 export type ApiSettings = {
   llm_model: string;
+  vlm_model: string;
+  structured_output_model: string;
   llm_base_url: string;
   agent: string;
   language: string;

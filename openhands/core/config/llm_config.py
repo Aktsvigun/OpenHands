@@ -47,17 +47,19 @@ class LLMConfig(BaseModel):
         reasoning_effort: The effort to put into reasoning. This is a string that can be one of 'low', 'medium', 'high', or 'none'. Exclusive for o1 models.
     """
 
-    model: str = Field(default='claude-3-5-sonnet-20241022')
+    model: str = Field(default='deepseek-ai/DeepSeek-V3')
+    vision_model: str = Field(default='Qwen/Qwen2-VL-72B-Instruct')
+    structured_output_model: str = Field(default='deepseek-ai/DeepSeek-V3')  # watt-ai/watt-tool-70B
     api_key: SecretStr | None = Field(default=None)
-    base_url: str | None = Field(default=None)
+    base_url: str | None = Field(default='https://api.studio.nebius.ai/v1')
     api_version: str | None = Field(default=None)
     embedding_model: str = Field(default='local')
-    embedding_base_url: str | None = Field(default=None)
+    embedding_base_url: str | None = Field(default='https://api.studio.nebius.ai/v1')
     embedding_deployment_name: str | None = Field(default=None)
     aws_access_key_id: SecretStr | None = Field(default=None)
     aws_secret_access_key: SecretStr | None = Field(default=None)
     aws_region_name: str | None = Field(default=None)
-    openrouter_site_url: str = Field(default='https://docs.all-hands.dev/')
+    openrouter_site_url: str = Field(default='https://studio.nebius.ai/')
     openrouter_app_name: str = Field(default='OpenHands')
     num_retries: int = Field(default=8)
     retry_multiplier: float = Field(default=2)
@@ -65,10 +67,10 @@ class LLMConfig(BaseModel):
     retry_max_wait: int = Field(default=120)
     timeout: int | None = Field(default=None)
     max_message_chars: int = Field(
-        default=30_000
+        default=90_000
     )  # maximum number of characters in an observation's content when sent to the llm
-    temperature: float = Field(default=0.0)
-    top_p: float = Field(default=1.0)
+    temperature: float = Field(default=1.0)
+    top_p: float = Field(default=0.01)
     custom_llm_provider: str | None = Field(default=None)
     max_input_tokens: int | None = Field(default=None)
     max_output_tokens: int | None = Field(default=None)

@@ -6,6 +6,8 @@ import { PostSettings, PostApiSettings } from "#/types/settings";
 const saveSettingsMutationFn = async (settings: Partial<PostSettings>) => {
   const apiSettings: Partial<PostApiSettings> = {
     llm_model: settings.LLM_MODEL,
+    vlm_model: settings.VLM_MODEL,
+    structured_output_model: settings.STRUCTURED_OUTPUT_MODEL,
     llm_base_url: settings.LLM_BASE_URL,
     agent: settings.AGENT || DEFAULT_SETTINGS.AGENT,
     language: settings.LANGUAGE || DEFAULT_SETTINGS.LANGUAGE,

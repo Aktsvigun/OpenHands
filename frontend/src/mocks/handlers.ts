@@ -9,6 +9,8 @@ import { ApiSettings, PostApiSettings } from "#/types/settings";
 
 export const MOCK_DEFAULT_USER_SETTINGS: ApiSettings | PostApiSettings = {
   llm_model: DEFAULT_SETTINGS.LLM_MODEL,
+  vlm_model: DEFAULT_SETTINGS.VLM_MODEL,
+  structured_output_model: DEFAULT_SETTINGS.STRUCTURED_OUTPUT_MODEL,
   llm_base_url: DEFAULT_SETTINGS.LLM_BASE_URL,
   llm_api_key: DEFAULT_SETTINGS.LLM_API_KEY,
   agent: DEFAULT_SETTINGS.AGENT,

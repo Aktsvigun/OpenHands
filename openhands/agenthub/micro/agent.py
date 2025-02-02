@@ -65,6 +65,7 @@ class MicroAgent(Agent):
         del self.delegates[self.agent_definition['name']]
 
     def step(self, state: State) -> Action:
+        import pdb; pdb.set_trace()
         last_user_message, last_image_urls = state.get_current_user_intent()
         prompt = self.prompt_template.render(
             state=state,

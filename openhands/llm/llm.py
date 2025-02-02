@@ -3,7 +3,7 @@ import os
 import time
 import warnings
 from functools import partial
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 
 import requests
 
@@ -72,10 +72,13 @@ FUNCTION_CALLING_SUPPORTED_MODELS = [
     'gpt-4o-mini',
     'gpt-4o',
     'o1-2024-12-17',
+    'deepseek-ai/DeepSeek-V3',
+    'watt-ai/watt-tool-70B'
 ]
 
 REASONING_EFFORT_SUPPORTED_MODELS = [
     'o1-2024-12-17',
+    'deepseek-ai/DeepSeek-R1',
 ]
 
 MODELS_WITHOUT_STOP_WORDS = [
@@ -95,6 +98,7 @@ class LLM(RetryMixin, DebugMixin):
         config: LLMConfig,
         metrics: Metrics | None = None,
         retry_listener: Callable[[int, int], None] | None = None,
+        modality: Literal["text", "vision", "structured_output"] = "text",
     ):
         """Initializes the LLM. If LLMConfig is passed, its values will be the fallback.
 
@@ -137,6 +141,15 @@ class LLM(RetryMixin, DebugMixin):
             self.tokenizer = create_pretrained_tokenizer(self.config.custom_tokenizer)
         else:
             self.tokenizer = None
+
+        if modality == "vision":
+            self.config.model = self.config.vision_model
+        elif modality == "structured_output":
+            self.config.model = self.config.structured_output_model
+        elif modality == "text":
+            pass
+        else:
+            raise ValueError(f'Modality {modality} is not supported.')
 
         # set up the completion function
         self._completion = partial(
@@ -234,6 +247,7 @@ class LLM(RetryMixin, DebugMixin):
                 # Record start time for latency measurement
                 start_time = time.time()
                 # we don't support streaming here, thus we get a ModelResponse
+                import pdb; pdb.set_trace()
                 resp: ModelResponse = self._completion_unwrapped(*args, **kwargs)
 
                 # Calculate and record latency
@@ -320,6 +334,8 @@ class LLM(RetryMixin, DebugMixin):
 
         Check the complete documentation at https://litellm.vercel.app/docs/completion
         """
+        import pdb;
+        pdb.set_trace()
         return self._completion
 
     def init_model_info(self):

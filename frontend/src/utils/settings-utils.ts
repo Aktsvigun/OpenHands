@@ -5,12 +5,16 @@ const extractBasicFormData = (formData: FormData) => {
   const model = formData.get("llm-model")?.toString();
 
   const LLM_MODEL = `${provider}/${model}`.toLowerCase();
+  const VLM_MODEL = `${provider}/${model}`.toLowerCase();
+  const STRUCTURED_OUTPUT_MODEL = `${provider}/${model}`.toLowerCase();
   const LLM_API_KEY = formData.get("api-key")?.toString();
   const AGENT = formData.get("agent")?.toString();
   const LANGUAGE = formData.get("language")?.toString();
 
   return {
     LLM_MODEL,
+    VLM_MODEL,
+    STRUCTURED_OUTPUT_MODEL,
     LLM_API_KEY,
     AGENT,
     LANGUAGE,
@@ -22,12 +26,16 @@ const extractAdvancedFormData = (formData: FormData) => {
   const isUsingAdvancedOptions = keys.includes("use-advanced-options");
 
   let CUSTOM_LLM_MODEL: string | undefined;
+  let CUSTOM_VLM_MODEL: string | undefined;
+  let CUSTOM_STRUCTURED_OUTPUT_MODEL: string | undefined;
   let LLM_BASE_URL: string | undefined;
   let CONFIRMATION_MODE = false;
   let SECURITY_ANALYZER: string | undefined;
 
   if (isUsingAdvancedOptions) {
     CUSTOM_LLM_MODEL = formData.get("custom-model")?.toString();
+    CUSTOM_VLM_MODEL = formData.get("custom-model")?.toString();
+    CUSTOM_STRUCTURED_OUTPUT_MODEL = formData.get("custom-model")?.toString();
     LLM_BASE_URL = formData.get("base-url")?.toString();
     CONFIRMATION_MODE = keys.includes("confirmation-mode");
     if (CONFIRMATION_MODE) {
@@ -38,6 +46,8 @@ const extractAdvancedFormData = (formData: FormData) => {
 
   return {
     CUSTOM_LLM_MODEL,
+    CUSTOM_VLM_MODEL,
+    CUSTOM_STRUCTURED_OUTPUT_MODEL,
     LLM_BASE_URL,
     CONFIRMATION_MODE,
     SECURITY_ANALYZER,
@@ -50,6 +60,8 @@ export const extractSettings = (formData: FormData): Partial<Settings> => {
 
   const {
     CUSTOM_LLM_MODEL,
+    CUSTOM_VLM_MODEL,
+    CUSTOM_STRUCTURED_OUTPUT_MODEL,
     LLM_BASE_URL,
     CONFIRMATION_MODE,
     SECURITY_ANALYZER,
@@ -57,6 +69,8 @@ export const extractSettings = (formData: FormData): Partial<Settings> => {
 
   return {
     LLM_MODEL: CUSTOM_LLM_MODEL || LLM_MODEL,
+    VLM_MODEL: CUSTOM_VLM_MODEL,
+    STRUCTURED_OUTPUT_MODEL: CUSTOM_STRUCTURED_OUTPUT_MODEL,
     LLM_API_KEY,
     AGENT,
     LANGUAGE,

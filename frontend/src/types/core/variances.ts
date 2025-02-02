@@ -19,6 +19,8 @@ export interface InitConfig {
     LANGUAGE: string;
     LLM_API_KEY: string;
     LLM_MODEL: string;
+    VLM_MODEL: string;
+    STRUCTURED_OUTPUT_MODEL: string;
   };
   token?: string;
   github_token?: string;

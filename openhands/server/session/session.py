@@ -1,6 +1,7 @@
 import asyncio
 import time
 from copy import deepcopy
+from typing import Literal
 
 import socketio
 
@@ -105,6 +106,8 @@ class Session:
         # TODO: override other LLM config & agent config groups (#2075)
 
         llm = self._create_llm(agent_cls)
+        vlm = self._create_llm(agent_cls, modality="vision")
+        solm = self._create_llm(agent_cls, modality="structured_output")
         agent_config = self.config.get_agent_config(agent_cls)
 
         if settings.enable_default_condenser:
@@ -114,7 +117,7 @@ class Session:
             logger.info(f'Enabling default condenser: {default_condenser_config}')
             agent_config.condenser = default_condenser_config
 
-        agent = Agent.get_cls(agent_cls)(llm, agent_config)
+        agent = Agent.get_cls(agent_cls)(llm, vlm, solm, agent_config)
 
         github_token = None
         selected_repository = None
@@ -142,13 +145,16 @@ class Session:
             )
             return
 
-    def _create_llm(self, agent_cls: str | None) -> LLM:
+    def _create_llm(
+            self, agent_cls: str | None, modality: Literal["text", "vision", "structured_output"] = "text"
+    ) -> LLM:
         """
         Initialize LLM, extracted for testing.
         """
         return LLM(
             config=self.config.get_llm_config_from_agent(agent_cls),
             retry_listener=self._notify_on_llm_retry,
+            modality=modality
         )
 
     def _notify_on_llm_retry(self, retries: int, max: int) -> None:

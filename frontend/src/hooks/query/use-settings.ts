@@ -10,6 +10,8 @@ const getSettingsQueryFn = async () => {
 
   return {
     LLM_MODEL: apiSettings.llm_model,
+    VLM_MODEL: apiSettings.vlm_model,
+    STRUCTURED_OUTPUT_MODEL: apiSettings.structured_output_model,
     LLM_BASE_URL: apiSettings.llm_base_url,
     AGENT: apiSettings.agent,
     LANGUAGE: apiSettings.language,

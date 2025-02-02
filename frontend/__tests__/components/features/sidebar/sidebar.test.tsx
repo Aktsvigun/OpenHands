@@ -51,7 +51,10 @@ describe("Sidebar", () => {
         confirmation_mode: false,
         enable_default_condenser: false,
         language: "en",
-        llm_model: "anthropic/claude-3-5-sonnet-20241022",
+        llm_base_url: "https://api.studio.nebius.ai/v1",
+        llm_model: "deepseek-ai/DeepSeek-V3",
+        structured_output_model: "deepseek-ai/DeepSeek-V3",
+        vlm_model: "Qwen/Qwen2-VL-72B-Instruct",
         remote_runtime_resource_factor: 1,
       });
     });
@@ -96,8 +99,10 @@ describe("Sidebar", () => {
         enable_default_condenser: false,
         github_token: "new-token",
         language: "no",
-        llm_base_url: "",
-        llm_model: "anthropic/claude-3-5-sonnet-20241022",
+        llm_base_url: "https://api.studio.nebius.ai/v1",
+        llm_model: "deepseek-ai/DeepSeek-V3",
+        structured_output_model: "deepseek-ai/DeepSeek-V3",
+        vlm_model: "Qwen/Qwen2-VL-72B-Instruct",
         remote_runtime_resource_factor: 1,
         security_analyzer: "",
         user_consents_to_analytics: true,
@@ -132,8 +137,10 @@ describe("Sidebar", () => {
         confirmation_mode: false,
         enable_default_condenser: false,
         language: "en",
-        llm_base_url: "",
-        llm_model: "anthropic/claude-3-5-sonnet-20241022",
+        llm_base_url: "https://api.studio.nebius.ai/v1",
+        llm_model: "deepseek-ai/DeepSeek-V3",
+        structured_output_model: "deepseek-ai/DeepSeek-V3",
+        vlm_model: "Qwen/Qwen2-VL-72B-Instruct",
         remote_runtime_resource_factor: 1,
       });
     });

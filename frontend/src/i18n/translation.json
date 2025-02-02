@@ -2017,7 +2017,7 @@
         "ja": "起動中！"
     },
     "CHAT_INTERFACE$AGENT_INIT_MESSAGE": {
-        "en": "Agent is initialized, waiting for task...",
+        "en": "Agent is initialized, waiting for the task...",
         "de": "Agent ist initialisiert und wartet auf Aufgabe...",
         "zh-CN": "智能体已初始化，等待任务中...",
         "zh-TW": "智能體已初始化，等待任務中...",
@@ -2032,7 +2032,7 @@
         "ja": "エージェントの初期化が完了しました。タスクを待機中..."
     },
     "CHAT_INTERFACE$AGENT_RUNNING_MESSAGE": {
-        "en": "Agent is running task",
+        "en": "Agent is running the task",
         "de": "Agent führt Aufgabe aus",
         "zh-CN": "智能体正在执行任务...",
         "zh-TW": "智能體正在執行任務...",
@@ -4512,5 +4512,11 @@
     },
     "SETTINGS_FORM$ENABLE_DEFAULT_CONDENSER_SWITCH_LABEL": {
         "en": "Enable Memory Condenser"
+    },
+    "SETTINGS_FORM$CUSTOM_VISION_MODEL_LABEL": {
+        "en": "Vision Model"
+    },
+    "SETTINGS_FORM$CUSTOM_STRUCTURED_OUTPUT_MODEL_LABEL": {
+        "en": "Structured Output Model"
     }
 }
