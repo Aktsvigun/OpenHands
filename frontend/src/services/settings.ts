@@ -3,11 +3,11 @@ import { Settings } from "#/types/settings";
 export const LATEST_SETTINGS_VERSION = 5;
 
 export const DEFAULT_SETTINGS: Settings = {
-  LLM_MODEL: "deepseek-ai/DeepSeek-V3",
-  VLM_MODEL: "Qwen/Qwen2-VL-72B-Instruct",
+  LLM_MODEL: "nebius/deepseek-ai/DeepSeek-V3",
+  VLM_MODEL: "nebius/Qwen/Qwen2-VL-72B-Instruct",
   // watt-ai/watt-tool-70B
-  STRUCTURED_OUTPUT_MODEL: "deepseek-ai/DeepSeek-V3",
-  LLM_BASE_URL: " https://api.studio.nebius.ai/v1",
+  STRUCTURED_OUTPUT_MODEL: "nebius/deepseek-ai/DeepSeek-V3",
+  LLM_BASE_URL: "https://api.studio.nebius.ai/v1",
   AGENT: "CodeActAgent",
   LANGUAGE: "en",
   LLM_API_KEY: null,

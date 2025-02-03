@@ -183,10 +183,8 @@ class PromptManager:
 
     def add_examples_to_initial_message(self, message: Message) -> None:
         """Add example_message to the first user message."""
-        example_message = self.get_example_user_message() or None
-
-        # Insert it at the start of the TextContent list
-        if example_message:
+        # Insert it at the beginning of the TextContent list
+        if (example_message := self.get_example_user_message()):
             message.content.insert(0, TextContent(text=example_message))
 
     def add_info_to_initial_message(

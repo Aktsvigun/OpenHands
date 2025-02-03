@@ -334,8 +334,6 @@ class LLM(RetryMixin, DebugMixin):
 
         Check the complete documentation at https://litellm.vercel.app/docs/completion
         """
-        import pdb;
-        pdb.set_trace()
         return self._completion
 
     def init_model_info(self):

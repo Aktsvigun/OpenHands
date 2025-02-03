@@ -218,6 +218,7 @@ class CodeActAgent(Agent):
                 )
             ]
         elif isinstance(action, MessageAction):
+            import pdb; pdb.set_trace()
             role = 'user' if action.source == 'user' else 'assistant'
             content = [TextContent(text=action.content or '')]
             if self.llm.vision_is_active() and action.image_urls:
@@ -376,9 +377,8 @@ class CodeActAgent(Agent):
         # prepare what we want to send to the LLM
         messages = self._get_messages(state)
         params: dict = {
-            'messages': self.llm.format_messages_for_llm(messages),
+            'messages': self.llm.format_messages_for_llm(messages), 'tools': self.tools
         }
-        params['tools'] = self.tools
         if self.mock_function_calling:
             params['mock_function_calling'] = True
         response = self.llm.completion(**params)

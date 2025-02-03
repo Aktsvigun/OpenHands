@@ -47,13 +47,13 @@ class LLMConfig(BaseModel):
         reasoning_effort: The effort to put into reasoning. This is a string that can be one of 'low', 'medium', 'high', or 'none'. Exclusive for o1 models.
     """
 
-    model: str = Field(default='deepseek-ai/DeepSeek-V3')
-    vision_model: str = Field(default='Qwen/Qwen2-VL-72B-Instruct')
-    structured_output_model: str = Field(default='deepseek-ai/DeepSeek-V3')  # watt-ai/watt-tool-70B
+    model: str = Field(default='nebius/deepseek-ai/DeepSeek-V3')
+    vision_model: str = Field(default='nebius/Qwen/Qwen2-VL-72B-Instruct')
+    structured_output_model: str = Field(default='nebius/deepseek-ai/DeepSeek-V3')  # watt-ai/watt-tool-70B
     api_key: SecretStr | None = Field(default=None)
     base_url: str | None = Field(default='https://api.studio.nebius.ai/v1')
     api_version: str | None = Field(default=None)
-    embedding_model: str = Field(default='local')
+    embedding_model: str = Field(default='nebius/BAAI/bge-en-icl')
     embedding_base_url: str | None = Field(default='https://api.studio.nebius.ai/v1')
     embedding_deployment_name: str | None = Field(default=None)
     aws_access_key_id: SecretStr | None = Field(default=None)
