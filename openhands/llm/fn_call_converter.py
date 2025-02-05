@@ -18,54 +18,43 @@ from openhands.core.exceptions import (
     FunctionCallValidationError,
 )
 
-# Inspired by: https://docs.together.ai/docs/llama-3-function-calling#function-calling-w-llama-31-70b
-SYSTEM_PROMPT_SUFFIX_TEMPLATE = """
-You have access to the following functions:
-
-{description}
-
-If you choose to call a function ONLY reply in the following format with NO suffix:
-
-<function=example_function_name>
-<parameter=example_parameter_1>value_1</parameter>
-<parameter=example_parameter_2>
-This is the value for the second parameter
-that can span
-multiple lines
-</parameter>
-</function>
-
-<IMPORTANT>
-Reminder:
-- Function calls MUST follow the specified format, start with <function= and end with </function>
-- Required parameters MUST be specified
-- Only call one function at a time
-- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after.
-- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls
-"""
-
-STOP_WORDS = ['</function']
-
 # NOTE: we need to make sure this example is always in-sync with the tool interface designed in openhands/agenthub/codeact_agent/function_calling.py
 IN_CONTEXT_LEARNING_EXAMPLE_PREFIX = """
+Do NOT assume the environment is the same as in the example above.
+
+--------------------- NEW TASK DESCRIPTION ---------------------
+""".lstrip()
+
+IN_CONTEXT_LEARNING_EXAMPLE_SUFFIX = """
+--------------------- END OF NEW TASK DESCRIPTION ---------------------
+
+PLEASE follow the format strictly! PLEASE EMIT ONE AND ONLY ONE FUNCTION CALL PER MESSAGE.
+"""
+
+# NOTE: we need to make sure this example is always in-sync with the tool interface designed in openhands/agenthub/codeact_agent/function_calling.py
+SYSTEM_PROMPT_EXAMPLE = """
 Here's a running example of how to perform a task with the provided tools.
 
 --------------------- START OF EXAMPLE ---------------------
 
-USER: Create a list of numbers from 1 to 10, and display them in a web page at port 5000.
+User: --------------------- NEW TASK DESCRIPTION ---------------------
+Create a list of numbers from 1 to 10, and display them in a web page at port 5000.
+--------------------- END OF NEW TASK DESCRIPTION ---------------------
 
-ASSISTANT: Sure! Let me first check the current directory:
+PLEASE follow the format strictly! PLEASE EMIT ONE AND ONLY ONE FUNCTION CALL PER MESSAGE.
+
+Assistant: Sure! Let me first check the current directory:
 <function=execute_bash>
 <parameter=command>
 pwd && ls
 </parameter>
 </function>
 
-USER: EXECUTION RESULT of [execute_bash]:
+User: EXECUTION RESULT of [execute_bash]:
 /workspace
 openhands@runtime:~/workspace$
 
-ASSISTANT: There is no `app.py` file in the current directory. Let me create a Python file `app.py`:
+Assistant: There is no `app.py` file in the current directory. Let me create a Python file `app.py`:
 <function=str_replace_editor>
 <parameter=command>create</parameter>
 <parameter=path>/workspace/app.py</parameter>
@@ -83,41 +72,41 @@ if __name__ == '__main__':
 </parameter>
 </function>
 
-USER: EXECUTION RESULT of [str_replace_editor]:
+User: EXECUTION RESULT of [str_replace_editor]:
 File created successfully at: /workspace/app.py
 
-ASSISTANT: I have created a Python file `app.py` that will display a list of numbers from 1 to 10 when you run it. Let me run the Python file for you:
+Assistant: I have created a Python file `app.py` that will display a list of numbers from 1 to 10 when you run it. Let me run the Python file for you:
 <function=execute_bash>
 <parameter=command>
 python3 app.py > server.log 2>&1 &
 </parameter>
 </function>
 
-USER: EXECUTION RESULT of [execute_bash]:
+User: EXECUTION RESULT of [execute_bash]:
 [1] 121
 [1]+  Exit 1                  python3 app.py > server.log 2>&1
 
-ASSISTANT: Looks like the server is running with PID 121 then crashed. Let me check the server log:
+Assistant: Looks like the server is running with PID 121 then crashed. Let me check the server log:
 <function=execute_bash>
 <parameter=command>
 cat server.log
 </parameter>
 </function>
 
-USER: EXECUTION RESULT of [execute_bash]:
+User: EXECUTION RESULT of [execute_bash]:
 Traceback (most recent call last):
   File "/workspace/app.py", line 2, in <module>
     from flask import Flask
 ModuleNotFoundError: No module named 'flask'
 
-ASSISTANT: Looks like the server crashed because the `flask` module is not installed. Let me install the `flask` module for you:
+Assistant: Looks like the server crashed because the `flask` module is not installed. Let me install the `flask` module for you:
 <function=execute_bash>
 <parameter=command>
 pip3 install flask
 </parameter>
 </function>
 
-USER: EXECUTION RESULT of [execute_bash]:
+User: EXECUTION RESULT of [execute_bash]:
 Defaulting to user installation because normal site-packages is not writeable
 Collecting flask
   Using cached flask-3.0.3-py3-none-any.whl (101 kB)
@@ -134,17 +123,17 @@ Requirement already satisfied: MarkupSafe>=2.0 in /home/openhands/.local/lib/pyt
 Installing collected packages: Werkzeug, itsdangerous, click, blinker, flask
 Successfully installed Werkzeug-3.0.2 blinker-1.7.0 click-8.1.7 flask-3.0.3 itsdangerous-2.2.0
 
-ASSISTANT: The `flask` module is installed successfully. Let me run the Python file again:
+Assistant: The `flask` module is installed successfully. Let me run the Python file again:
 <function=execute_bash>
 <parameter=command>
 python3 app.py > server.log 2>&1 &
 </parameter>
 </function>
 
-USER: EXECUTION RESULT of [execute_bash]:
+User: EXECUTION RESULT of [execute_bash]:
 [1] 124
 
-ASSISTANT:
+Assistant:
 Let me check the server log again:
 <function=execute_bash>
 <parameter=command>
@@ -152,19 +141,19 @@ cat server.log
 </parameter>
 </function>
 
-USER: EXECUTION RESULT of [execute_bash]:
+User: EXECUTION RESULT of [execute_bash]:
 * Serving Flask app 'app'
  * Debug mode: off
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on http://127.0.0.1:5000
 Press CTRL+C to quit
 
-ASSISTANT:
+Assistant:
 The server is running on port 5000 with PID 124. You can access the list of numbers by visiting http://127.0.0.1:5000. If you have any further questions, feel free to ask!
 
-USER: Now kill the server, make it display the numbers in a table format.
+User: Now kill the server, make it display the numbers in a table format.
 
-ASSISTANT:
+Assistant:
 Sure! Let me stop the server first:
 <function=execute_bash>
 <parameter=command>
@@ -172,31 +161,31 @@ kill 124
 </parameter>
 </function>
 
-USER: EXECUTION RESULT of [execute_bash]:
+User: EXECUTION RESULT of [execute_bash]:
 [1]+  Terminated              python3 app.py > server.log 2>&1
 
-ASSISTANT:
+Assistant:
 Now let me display the numbers in a table format:
 <function=str_replace_editor>
 <parameter=command>str_replace</parameter>
 <parameter=path>/workspace/app.py</parameter>
 <parameter=old_str>return str(numbers)</parameter>
-<parameter=new_str>return '<table>' + ''.join([f'<tr><td>{i}</td></tr>' for i in numbers]) + '</table>'</parameter>
+<parameter=new_str>return '<table>' + ''.join([f'<tr><td>{{i}}</td></tr>' for i in numbers]) + '</table>'</parameter>
 </function>
 
-USER: EXECUTION RESULT of [str_replace_editor]:
+User: EXECUTION RESULT of [str_replace_editor]:
 The file /workspace/app.py has been edited. Here's the result of running `cat -n` on a snippet of /workspace/app.py:
      3
      4  @app.route('/')
      5  def index():
      6      numbers = list(range(1, 11))
-     7      return '<table>' + ''.join([f'<tr><td>{i}</td></tr>' for i in numbers]) + '</table>'
+     7      return '<table>' + ''.join([f'<tr><td>{{i}}</td></tr>' for i in numbers]) + '</table>'
      8
      9  if __name__ == '__main__':
     10      app.run(port=5000)
 Review the changes and make sure they are as expected. Edit the file again if necessary.
 
-ASSISTANT:
+Assistant:
 Running the updated file:
 <function=execute_bash>
 <parameter=command>
@@ -204,26 +193,48 @@ python3 app.py > server.log 2>&1 &
 </parameter>
 </function>
 
-USER: EXECUTION RESULT of [execute_bash]:
+User: EXECUTION RESULT of [execute_bash]:
 [1] 126
 
-ASSISTANT:
+Assistant:
 The server is running on port 5000 with PID 126. You can access the list of numbers in a table format by visiting http://127.0.0.1:5000. Let me know if you have any further requests!
 <function=finish>
 </function>
 
 --------------------- END OF EXAMPLE ---------------------
 
-Do NOT assume the environment is the same as in the example above.
-
---------------------- NEW TASK DESCRIPTION ---------------------
-""".lstrip()
-
-IN_CONTEXT_LEARNING_EXAMPLE_SUFFIX = """
---------------------- END OF NEW TASK DESCRIPTION ---------------------
-
-PLEASE follow the format strictly! PLEASE EMIT ONE AND ONLY ONE FUNCTION CALL PER MESSAGE.
+The environment from the example above is only valid for this example. For the user's task, it can be different.
 """
+
+# Inspired by: https://docs.together.ai/docs/llama-3-function-calling#function-calling-w-llama-31-70b
+SYSTEM_PROMPT_SUFFIX_TEMPLATE = """
+You have access to the following functions:
+
+{description}
+
+If you choose to call a function, ONLY reply strictly in the following format with NO suffix (without triple backticks):
+```
+<function=example_function_name>
+<parameter=example_parameter_1>value_1</parameter>
+<parameter=example_parameter_2>
+This is the value for the second parameter
+that can span
+multiple lines
+</parameter>
+</function>
+```
+
+<IMPORTANT>
+Reminder:
+- Function calls MUST follow the specified format, start with <function= and end with </function>
+- Required parameters MUST be specified
+- Only call one function at a time
+- You may provide reasoning for your function call in natural language if necessary BEFORE the function call, but NOT after
+- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls
+</IMPORTANT>
+""" + SYSTEM_PROMPT_EXAMPLE
+
+STOP_WORDS = ['</function']
 
 # Regex patterns for function call parsing
 FN_REGEX_PATTERN = r'<function=([^>]+)>\n(.*?)</function>'

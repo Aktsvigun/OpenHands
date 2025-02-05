@@ -248,7 +248,14 @@ class LLM(RetryMixin, DebugMixin):
             start_time = time.time()
 
             # we don't support streaming here, thus we get a ModelResponse
+            # import json as json_
+            # with open('tmp_input.json', 'w') as f:
+            #     json_.dump(kwargs, f)
+            # import ipdb; ipdb.set_trace()
             resp: ModelResponse = self._completion_unwrapped(*args, **kwargs)
+            # import json as json_
+            # with open('tmp_input.json', 'w') as f:
+            #     json_.dump(kwargs['messages'] + [{'role': 'assistant', 'content': resp.choices[0].message.content}], f)
 
             # Calculate and record latency
             latency = time.time() - start_time

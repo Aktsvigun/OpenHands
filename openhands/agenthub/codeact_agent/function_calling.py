@@ -48,7 +48,7 @@ CmdRunTool = ChatCompletionToolParam(
             'properties': {
                 'command': {
                     'type': 'string',
-                    'description': 'The bash command to execute. Can be empty string to view additional logs when previous exit code is `-1`. Can be `C-c` (Ctrl+C) to interrupt the currently running process. Note: You can only execute one bash command at a time. If you need to run multiple commands sequentially, you can use `&&` or `;` to chain them together.',
+                    'description': 'The bash command to execute. Can be an empty string to view additional logs when previous exit code is `-1`. Can be `C-c` (Ctrl+C) to interrupt the currently running process. Note: You can only execute one bash command at a time. If you need to run multiple commands sequentially, you can use `&&` or `;` to chain them together.',
                 },
                 'is_input': {
                     'type': 'string',
@@ -314,14 +314,14 @@ _BROWSER_DESCRIPTION = """Interact with the browser using Python code. Use it ON
 See the description of "code" parameter for more details.
 
 Multiple actions can be provided at once, but will be executed sequentially without any feedback from the page.
-More than 2-3 actions usually leads to failure or unexpected behavior. Example:
+More than 2-3 actions usually lead to failure or unexpected behavior. Example:
 fill('a12', 'example with "quotes"')
 click('a51')
 click('48', button='middle', modifiers=['Shift'])
 """
 
 _BROWSER_TOOL_DESCRIPTION = """
-The following 15 functions are available. Nothing else is supported.
+The following 15 sub-functions are available. Nothing else is supported.
 
 goto(url: str)
     Description: Navigate to a url.
@@ -344,23 +344,23 @@ noop(wait_ms: float = 1000)
     Examples:
         noop()
 
-        noop(500)
+        noop(500)  # wait 500 milliseconds
 
 scroll(delta_x: float, delta_y: float)
     Description: Scroll horizontally and vertically. Amounts in pixels, positive for right or down scrolling, negative for left or up scrolling. Dispatches a wheel event.
     Examples:
-        scroll(0, 200)
+        scroll(0, 200)  # scroll 200 pixels down
 
-        scroll(-50.2, -100.5)
+        scroll(-50.2, -100.5)  # scroll 50.2 pixels left and 100.5 pixels up
 
 fill(bid: str, value: str)
     Description: Fill out a form field. It focuses the element and triggers an input event with the entered text. It works for <input>, <textarea> and [contenteditable] elements.
     Examples:
-        fill('237', 'example value')
+        fill('237', 'example value')  # Fill the element identified by bid '237' with the value 'example value'
 
-        fill('45', 'multi-line\nexample')
+        fill('45', 'multi-line\nexample')  # Fill the element identified by bid '45' with multi-line value 'multi-line\nexample'
 
-        fill('a12', 'example with "quotes"')
+        fill('a12', 'example with "quotes"')  # Fill the element identified by bid 'a12' with the value 'example with "quotes"'
 
 select_option(bid: str, options: str | list[str])
     Description: Select one or multiple options in a <select> element. You can specify option value or label to select. Multiple options can be selected.
@@ -444,7 +444,7 @@ BrowserTool = ChatCompletionToolParam(
                 'code': {
                     'type': 'string',
                     'description': (
-                        'The Python code that interacts with the browser.\n'
+                        'The Python code that interacts with the browser using one of the supported sub-functions.\n'
                         + _BROWSER_TOOL_DESCRIPTION
                     ),
                 }
