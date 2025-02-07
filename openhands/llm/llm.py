@@ -253,9 +253,11 @@ class LLM(RetryMixin, DebugMixin):
             #     json_.dump(kwargs, f)
             # import ipdb; ipdb.set_trace()
             resp: ModelResponse = self._completion_unwrapped(*args, **kwargs)
-            # import json as json_
-            # with open('tmp_input.json', 'w') as f:
-            #     json_.dump(kwargs['messages'] + [{'role': 'assistant', 'content': resp.choices[0].message.content}], f)
+            import json as json_
+            with open('tmp_input.json', 'w') as f:
+                json_.dump(kwargs['messages'], f)
+            with open('tmp_output.json', 'w') as f:
+                json_.dump([{'role': 'assistant', 'content': resp.choices[0].message.content}], f)
 
             # Calculate and record latency
             latency = time.time() - start_time
