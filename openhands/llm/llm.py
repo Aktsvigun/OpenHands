@@ -26,6 +26,7 @@ from litellm.exceptions import (
 )
 from litellm.types.utils import CostPerToken, ModelResponse, Usage
 from litellm.utils import create_pretrained_tokenizer
+from jinja2 import Template
 
 from openhands.core.logger import openhands_logger as logger
 from openhands.core.message import Message
@@ -230,6 +231,10 @@ class LLM(RetryMixin, DebugMixin):
                 # add stop words if the model supports it
                 if self.config.model not in MODELS_WITHOUT_STOP_WORDS:
                     kwargs['stop'] = STOP_WORDS
+                kwargs['tool_choice'] = (
+                    'none'
+                # force no tool calling because we're mocking it - without it, it will cause issue with sglang
+                )
 
                 mock_fncall_tools = kwargs.pop('tools')
 
@@ -246,10 +251,8 @@ class LLM(RetryMixin, DebugMixin):
             # True by default to allow litellm to do transformations like adding a default message, when a message is empty
             # NOTE: this setting is global; unlike drop_params, it cannot be overridden in the litellm completion partial
             litellm.modify_params = self.config.modify_params
-
             # Record start time for latency measurement
             start_time = time.time()
-
             # we don't support streaming here, thus we get a ModelResponse
             # import json as json_
             # with open('tmp_input.json', 'w') as f:
@@ -714,3 +717,74 @@ class LLM(RetryMixin, DebugMixin):
 
         # let pydantic handle the serialization
         return [message.model_dump() for message in messages]
+
+    def filter_messages(self, messages: list[dict[str, str]]) -> list[dict[str, str]] | None:
+        system_prompt = self._load_system_prompt_filtering()
+        user_prompt = self._create_user_prompt_filtering(messages)
+        filter_messages = [{'role': 'system', 'content': system_prompt}, {'role': 'user', 'content': user_prompt}]
+        filtering_results = None
+        num_retries = 0
+        while (filtering_results is None) and (num_retries < self.config.num_filtering_retries):
+            response = self._completion_unwrapped(messages=filter_messages)
+            filtering_results = self._try_parse_filtering_completion(response)
+            if filtering_results is None:
+                time.sleep(5)
+        return filtering_results
+        # if filtering_results is None:
+        #     return None
+        # filtered_messages = messages[:2]
+        # for i, verdict in enumerate(filtering_results):
+        #     if verdict:
+        #         filtered_messages += messages[i * 2 + 2:i * 2 + 4]
+        # return filtered_messages
+
+    def _try_parse_filtering_completion(self, response) -> list[int] | None:
+        output = response.choices[0].message.content
+        output = output.replace('```', '').strip()
+        filtering_results = []
+        next_line_has_verdict = False
+        for line in output.splitlines():
+            if line.startswith('Pair'):
+                next_line_has_verdict = True
+            elif next_line_has_verdict:
+                # In this case we need to relaunch the filtering since the output format is broken
+                if not line.startswith('Filter:'):
+                    return None
+                verdict = int(line.split('Filter: ')[1].strip())
+                if not verdict in [0, 1]:
+                    verdict = 0
+                filtering_results.append(verdict)
+                next_line_has_verdict = False
+        return filtering_results
+
+
+    def _load_system_prompt_filtering(self):
+        template_path = os.path.join(__file__[:__file__.rindex('/')], 'prompts', 'filtering_system_prompt.j2')
+        with open(template_path, 'r') as file:
+            return Template(file.read()).render().strip()
+
+    def _create_user_prompt_filtering(self, messages: list[dict[str, str]]) -> str:
+        user_prompt = "Here is your current conversation (goes after '''):\n'''\n"
+        for message in messages:
+            user_prompt += (message['role'].title() + ":\n" + message['content'] + '\n\n')
+        user_prompt = (
+            user_prompt.strip() + "\n'''\n\nNow please write for each assistant/user message pair, whether it should be filtered out (1) or not (0):\n```\n"
+        )
+
+        for i, message in enumerate(messages[2:], 2):
+            if i % 2 == 1:
+                continue
+            assert message['role'] == 'assistant'
+            user_prompt += f'Pair {i // 2}:\n'
+            user_prompt += ('Assistant: ' + ' '.join(message['content'].split(' ')[:15])[:150] + '...' + '\n')
+            user_prompt += ('User: ' + ' '.join(messages[i + 1]['content'].split()[:15])[:150] + '...' + '\n')
+            user_prompt += ('Filter: 0/1\n\n')
+        user_prompt = (user_prompt.strip() + '\n```')
+        return user_prompt
+
+    def _get_token_count(self, messages: list[dict[str, str]]) -> int:
+        return litellm.token_counter(
+            model=self.config.model,
+            messages=messages,
+            custom_tokenizer=self.tokenizer,
+        )

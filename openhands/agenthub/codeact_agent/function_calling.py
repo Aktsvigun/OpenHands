@@ -311,6 +311,8 @@ _browser_action_space = HighLevelActionSet(
 
 _BROWSER_DESCRIPTION = """Interact with the browser using Python code. Use it ONLY when you need to interact with a webpage.
 
+If you need to browse and find some information, use the Bing search rather than Google.
+ 
 See the description of "code" parameter for more details.
 
 Multiple actions can be provided at once, but will be executed sequentially without any feedback from the page.

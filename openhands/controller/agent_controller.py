@@ -659,6 +659,16 @@ class AgentController:
             action = self._replay_manager.step()
         else:
             try:
+                messages = self.agent._get_messages(self.state)
+                messages = [{'role': mes.role, 'content': '\n'.join(x.text for x in mes.content)} for mes in messages]
+                if self.agent.llm._get_token_count(messages) > self.agent.llm.config.max_tokens_before_messages_filtering:
+                    filtering_results = self.agent.llm.filter_messages(messages)
+                    if filtering_results is not None:
+                        filtered_history = self.state.history[:1]
+                        for i, verdict in enumerate(filtering_results):
+                            if verdict:
+                                filtered_history += self.state.history[i * 2 + 1:i * 2 + 3]
+                        self.state.history = filtered_history
                 action = self.agent.step(self.state)
                 if action is None:
                     raise LLMNoActionError('No action was returned')

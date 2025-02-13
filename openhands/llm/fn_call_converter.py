@@ -37,24 +37,24 @@ Here's a running example of how to perform a task with the provided tools.
 
 --------------------- START OF EXAMPLE ---------------------
 
-User: --------------------- NEW TASK DESCRIPTION ---------------------
+USER: --------------------- NEW TASK DESCRIPTION ---------------------
 Create a list of numbers from 1 to 10, and display them in a web page at port 5000.
 --------------------- END OF NEW TASK DESCRIPTION ---------------------
 
 PLEASE follow the format strictly! PLEASE EMIT ONE AND ONLY ONE FUNCTION CALL PER MESSAGE.
 
-Assistant: Sure! Let me first check the current directory:
+ASSISTANT: Sure! Let me first check the current directory:
 <function=execute_bash>
 <parameter=command>
 pwd && ls
 </parameter>
 </function>
 
-User: EXECUTION RESULT of [execute_bash]:
+USER: EXECUTION RESULT of [execute_bash]:
 /workspace
 openhands@runtime:~/workspace$
 
-Assistant: There is no `app.py` file in the current directory. Let me create a Python file `app.py`:
+ASSISTANT: There is no `app.py` file in the current directory. Let me create a Python file `app.py`:
 <function=str_replace_editor>
 <parameter=command>create</parameter>
 <parameter=path>/workspace/app.py</parameter>
@@ -72,41 +72,41 @@ if __name__ == '__main__':
 </parameter>
 </function>
 
-User: EXECUTION RESULT of [str_replace_editor]:
+USER: EXECUTION RESULT of [str_replace_editor]:
 File created successfully at: /workspace/app.py
 
-Assistant: I have created a Python file `app.py` that will display a list of numbers from 1 to 10 when you run it. Let me run the Python file for you:
+ASSISTANT: I have created a Python file `app.py` that will display a list of numbers from 1 to 10 when you run it. Let me run the Python file for you:
 <function=execute_bash>
 <parameter=command>
 python3 app.py > server.log 2>&1 &
 </parameter>
 </function>
 
-User: EXECUTION RESULT of [execute_bash]:
+USER: EXECUTION RESULT of [execute_bash]:
 [1] 121
 [1]+  Exit 1                  python3 app.py > server.log 2>&1
 
-Assistant: Looks like the server is running with PID 121 then crashed. Let me check the server log:
+ASSISTANT: Looks like the server is running with PID 121 then crashed. Let me check the server log:
 <function=execute_bash>
 <parameter=command>
 cat server.log
 </parameter>
 </function>
 
-User: EXECUTION RESULT of [execute_bash]:
+USER: EXECUTION RESULT of [execute_bash]:
 Traceback (most recent call last):
   File "/workspace/app.py", line 2, in <module>
     from flask import Flask
 ModuleNotFoundError: No module named 'flask'
 
-Assistant: Looks like the server crashed because the `flask` module is not installed. Let me install the `flask` module for you:
+ASSISTANT: Looks like the server crashed because the `flask` module is not installed. Let me install the `flask` module for you:
 <function=execute_bash>
 <parameter=command>
 pip3 install flask
 </parameter>
 </function>
 
-User: EXECUTION RESULT of [execute_bash]:
+USER: EXECUTION RESULT of [execute_bash]:
 Defaulting to user installation because normal site-packages is not writeable
 Collecting flask
   Using cached flask-3.0.3-py3-none-any.whl (101 kB)
@@ -123,17 +123,17 @@ Requirement already satisfied: MarkupSafe>=2.0 in /home/openhands/.local/lib/pyt
 Installing collected packages: Werkzeug, itsdangerous, click, blinker, flask
 Successfully installed Werkzeug-3.0.2 blinker-1.7.0 click-8.1.7 flask-3.0.3 itsdangerous-2.2.0
 
-Assistant: The `flask` module is installed successfully. Let me run the Python file again:
+ASSISTANT: The `flask` module is installed successfully. Let me run the Python file again:
 <function=execute_bash>
 <parameter=command>
 python3 app.py > server.log 2>&1 &
 </parameter>
 </function>
 
-User: EXECUTION RESULT of [execute_bash]:
+USER: EXECUTION RESULT of [execute_bash]:
 [1] 124
 
-Assistant:
+ASSISTANT:
 Let me check the server log again:
 <function=execute_bash>
 <parameter=command>
@@ -141,19 +141,19 @@ cat server.log
 </parameter>
 </function>
 
-User: EXECUTION RESULT of [execute_bash]:
+USER: EXECUTION RESULT of [execute_bash]:
 * Serving Flask app 'app'
  * Debug mode: off
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on http://127.0.0.1:5000
 Press CTRL+C to quit
 
-Assistant:
+ASSISTANT:
 The server is running on port 5000 with PID 124. You can access the list of numbers by visiting http://127.0.0.1:5000. If you have any further questions, feel free to ask!
 
-User: Now kill the server, make it display the numbers in a table format.
+USER: Now kill the server, make it display the numbers in a table format.
 
-Assistant:
+ASSISTANT:
 Sure! Let me stop the server first:
 <function=execute_bash>
 <parameter=command>
@@ -161,10 +161,10 @@ kill 124
 </parameter>
 </function>
 
-User: EXECUTION RESULT of [execute_bash]:
+USER: EXECUTION RESULT of [execute_bash]:
 [1]+  Terminated              python3 app.py > server.log 2>&1
 
-Assistant:
+ASSISTANT:
 Now let me display the numbers in a table format:
 <function=str_replace_editor>
 <parameter=command>str_replace</parameter>
@@ -173,7 +173,7 @@ Now let me display the numbers in a table format:
 <parameter=new_str>return '<table>' + ''.join([f'<tr><td>{{i}}</td></tr>' for i in numbers]) + '</table>'</parameter>
 </function>
 
-User: EXECUTION RESULT of [str_replace_editor]:
+USER: EXECUTION RESULT of [str_replace_editor]:
 The file /workspace/app.py has been edited. Here's the result of running `cat -n` on a snippet of /workspace/app.py:
      3
      4  @app.route('/')
@@ -185,7 +185,7 @@ The file /workspace/app.py has been edited. Here's the result of running `cat -n
     10      app.run(port=5000)
 Review the changes and make sure they are as expected. Edit the file again if necessary.
 
-Assistant:
+ASSISTANT:
 Running the updated file:
 <function=execute_bash>
 <parameter=command>
@@ -193,10 +193,10 @@ python3 app.py > server.log 2>&1 &
 </parameter>
 </function>
 
-User: EXECUTION RESULT of [execute_bash]:
+USER: EXECUTION RESULT of [execute_bash]:
 [1] 126
 
-Assistant:
+ASSISTANT:
 The server is running on port 5000 with PID 126. You can access the list of numbers in a table format by visiting http://127.0.0.1:5000. Let me know if you have any further requests!
 <function=finish>
 </function>

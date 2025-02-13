@@ -67,6 +67,10 @@ class LLMConfig(BaseModel):
     max_message_chars: int = Field(
         default=30_000
     )  # maximum number of characters in an observation's content when sent to the llm
+    max_tokens_before_messages_filtering: int = Field(
+        80_000
+    )  # maximum total number of tokens in messages before filtering useless messages
+    num_filtering_retries: int = 3  # maximum total number of retries to parse filtering response
     temperature: float = Field(default=0.0)
     top_p: float = Field(default=1.0)
     custom_llm_provider: str | None = Field(default=None)
